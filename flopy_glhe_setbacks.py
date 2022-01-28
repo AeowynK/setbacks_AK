@@ -40,10 +40,10 @@ strt = np.zeros((nlay, nrow, ncol), dtype=np.float32)
 
 # define stress periods
 nper = 1
-# just one stress perios
-perlen = [259200]
-# 72 hours in seconds
-nstp = [20]
+# just one stress period
+perlen = [182 * 86400]
+# 182 days in seconds
+nstp = [50]
 # number of steps
 steady = [False]
 # steady state condition
@@ -59,7 +59,7 @@ dis = flopy.modflow.ModflowDis(
     ncol,
     delr=delr,
     delc=delc,
-    tsmult=1.1,
+    tsmult=1.2, # time step multiplier 
     top=ztop,
     botm=botm[1:],
     nper=nper,
