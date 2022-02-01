@@ -27,6 +27,7 @@ delv = (ztop - zbot) / nlay
 botm = np.linspace(ztop, zbot, nlay + 1)
 hk = 2.0
 # thermal conductivity, units of W/mK
+
 # sy = 0.1 # specific yield, don't need bc confined
 ss = 2.0e6
 # specific storage in J/m^3*K
@@ -41,8 +42,9 @@ strt = np.zeros((nlay, nrow, ncol), dtype=np.float32)
 # define stress periods
 nper = 1
 # just one stress period
+
 perlen = [182 * 86400]
-# 182 days in seconds
+# period length, 182 days in seconds
 nstp = [50]
 # number of steps
 steady = [False]
