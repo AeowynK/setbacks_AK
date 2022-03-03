@@ -52,6 +52,7 @@ mflow/
 *.oc
 *.pcg
 *.wel
+*.nam
 
 # Large media files
 *.mp4
