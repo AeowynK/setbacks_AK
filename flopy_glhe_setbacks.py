@@ -11,11 +11,11 @@ import flopy.utils.binaryfile as bf
 
 # assigning model info:
 
-Lx = 20.0
-Ly = 20.0
+Lx = 25.
+Ly = 25.
 # size of model, in meters
 ztop = 0.0
-zbot = -50.0
+zbot = -1.0
 # thickness, b
 nlay = 1
 nrow = 100
@@ -25,7 +25,7 @@ delr = Lx / ncol
 delc = Ly / nrow
 delv = (ztop - zbot) / nlay
 botm = np.linspace(ztop, zbot, nlay + 1)
-hk = 2.0
+hk = 2.5
 # thermal conductivity, units of W/mK
 # sy = 0.1 # specific yield, don't need bc confined
 ss = 2.0e6
@@ -39,13 +39,13 @@ ibound = np.ones((nlay, nrow, ncol), dtype=np.int32)
 strt = np.zeros((nlay, nrow, ncol), dtype=np.float32)
 
 # define stress periods
-nper = 1
+nper = 2
 # just one stress period
-perlen = [182 * 86400]
+perlen = [91 * 86400, 91 * 86400]
 # 182 days in seconds
-nstp = [50]
+nstp = [50,50]
 # number of steps
-steady = [False]
+steady = [False, False]
 # steady state condition
 
 # creating the static flopy objects (not time-dependent):
@@ -77,10 +77,11 @@ pcg = flopy.modflow.ModflowPcg(mf)
 # create the well package object, of type: flopy.modflow.ModflowWel()
 # Remember to use zero-based layer, row, column indices!
 
-pumping_rate = -500.0
+pumping_rate = -10.0
 # thermal 'discharge' of 10 W/m multiplied by thickness, b
 wel_sp1 = [[0, nrow / 2 - 1, ncol / 2 - 1, pumping_rate], [0, nrow / 4, ncol / 4, pumping_rate]]
-stress_period_data = {0: wel_sp1}
+wel_sp2 = [[0, nrow / 2 - 1, ncol / 2 - 1, 0], [0, nrow / 4, ncol / 4, 0]]
+stress_period_data = {0: wel_sp1, 1: wel_sp2}
 wel = flopy.modflow.ModflowWel(mf, stress_period_data=stress_period_data)
 
 # create the output control package, of type: flopy.modflow.ModflowOc()
@@ -119,7 +120,7 @@ times = headobj.get_times()
 cbb = bf.CellBudgetFile(modelname + ".cbc")
 
 # Plot the temperature change versus time
-idx = (0, int(nrow / 2) - 1, int(ncol / 2) + 0)
+idx = (0, int(nrow / 2) - 1, int(ncol / 2) - 1)
 ts = headobj.get_ts(idx)
 fig = plt.figure(figsize=(6, 6))
 ax = fig.add_subplot(1, 1, 1)
@@ -141,8 +142,8 @@ head = hds.get_data(totim=times[-1])
 extent = (delr / 2.0, Lx - delr / 2.0, Ly - delc / 2.0, delc / 2.0)
 fig = plt.figure(figsize=(6, 6))
 ax = fig.add_subplot(1, 1, 1, aspect="equal")
-ax.contour(head[0, :, :], levels=np.arange(-1, 0, .1), extent=extent)
-
+CS = ax.contour(head[0, :, :], levels=np.arange(-1, 0, .1), extent=extent)
+ax.clabel(CS, CS.levels, inline=True, fontsize=8)
 # extracting the cell-by-cell flows
 #cbb = bf.CellBudgetFile(f"{modelname}.cbc")
 kstpkper_list = cbb.get_kstpkper()
