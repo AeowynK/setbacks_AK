@@ -38,24 +38,28 @@ ibound = np.ones((nlay, nrow, ncol), dtype=np.int32)
 # starting head set at zero. head represents thermal reservoir in this model
 strt = np.zeros((nlay, nrow, ncol), dtype=np.float32)
 
-# define stress periods
-nper = 9
-# just one stress period
-rech_days = 120
-rest_days = 60
-use_days = 60
-perlen = [rech_days * 86400, rest_days * 86400, use_days * 86400,
-          rech_days * 86400, rest_days * 86400, use_days * 86400,
-          rech_days * 86400, rest_days * 86400, use_days * 86400]
+'''
+get data
++'''
 
-# 182 days in seconds
-nstp = [20, 20, 20, 20, 20, 20, 20, 20, 20]
-# number of steps
-steady = [False, False, False, False, False, False, False, False, False]
-# steady state condition
+data = pd.read_csv('./data/varying_load_periodic.csv')
+Q = np.asarray(data['load [W/m]'].fillna(float(0)))
+
+'''
+set up stress period times
+'''
+# define stress periods
+nper = len(data)
+nstp = np.ones(nper, dtype=int)*5
+perlen = np.ones(nper)*3600
+tsmult = 1.2
+
+# steady state condition - False for transient
+steady = np.zeros(nper, dtype=bool)
+
 
 # creating the static flopy objects (not time-dependent):
-modelname = "./superposition/combined"
+modelname = "./superposition/varying_load_test"
 mf = flopy.modflow.Modflow(modelname, exe_name="./mflow/mf2005")
 # executable called
 dis = flopy.modflow.ModflowDis(
@@ -99,46 +103,12 @@ pcg = flopy.modflow.ModflowPcg(mf)
 # create the well package object, of type: flopy.modflow.ModflowWel()
 # Remember to use zero-based layer, row, column indices!
 
-'''
-get data
-+'''
-
-data = pd.read_csv('.\data\test_file_csv')
-Q = np.asarray(data['heatflow'].fillna(float(0)))
-
-'''
-set up stress period times
-'''
-nper = len(observations)
-nstp_val = 5
-perlen_val = data['t_sec'][0]
-tsmult_val = 1.2
-
-
-def TS_StressPeriod_Dict(nper, perlen_val, nstp_val, tsmult_val):
-    ts_list = []
-    for i in range(nper):
-        ts_list.append((perlen_val, nstp_val, tsmult_val))
-    return ts_list
-
-
-ts_list = TS_StressPeriod_Dict(nper, perlen_val, nstp_val, tsmult_val)
-
-# Create the Flopy temporal discretization object
-tdis = flopy.mf6.modflow.mftdis.ModflowTdis(sim, pname='tdis',
-                                        time_units='seconds', nper=nper,
-                                        perioddata=ts_list)
-
 #well info
-x_wellcells = [0]
-y_wellcells = [0]
+x_wellcells = [50]
+y_wellcells = [50]
 well_layers = [0]
 
 #well package for w/m energy input/extraction
-welPeriod = []
-for wl in well_layers:
-    for x,y in zip(x_wellcells,y_wellcells):
-            welPeriod.append(((wl, x, y), Q))
 
 def BH_StressPeriod_Dict(Well_layers, Well_rows, Well_columns, Q):
     sp_list = []
@@ -148,7 +118,7 @@ def BH_StressPeriod_Dict(Well_layers, Well_rows, Well_columns, Q):
         for layer in Well_layers:
             for row in Well_rows:
                 for column in Well_columns:
-                    sp_temp.append(((layer, row, column), Q_val))
+                    sp_temp.append((layer, row, column, Q_val))
         sp_list.append(sp_temp)
 
     it = iter(sp_list)
@@ -195,8 +165,7 @@ times = headobj.get_times()
 cbb = bf.CellBudgetFile(modelname + ".cbc")
 
 # Plot the temperature change versus time
-idx = (0, int(nrow / 2) - 1, int(ncol / 2) - 1)
-idx = (0, 0, 60)
+idx = (0, int(nrow / 4) - 1, int(ncol / 4) - 1)
 ts = headobj.get_ts(idx)
 fig = plt.figure(figsize=(6, 6))
 ax = fig.add_subplot(1, 1, 1)
