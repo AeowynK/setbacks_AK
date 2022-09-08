@@ -343,7 +343,7 @@ if __name__ == "__main__":
 
     params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
 
-    load = 7 # degree to which system is unbalanced. Value would be 0 for perfectly balanced load
+    load = 7.0 # degree to which load is unbalanced; would be 0 for perfectly balanced load
     
     B = 6.0   # in meters; CSA standard is 3m to property lines
     
@@ -353,13 +353,16 @@ if __name__ == "__main__":
     
     result = glhe_groundwater_model(params, x_locs, y_locs, times)
    # print(result)
-    s = np.asarray(result[2]).sum()
+    s = np.asarray(result[2]).sum()    # sum the delT values 
     print("sum of delta Ts:", s)
-    temp = s*load
+    
+    temp = s*load    # multiply the sum by the load 
     print("Multiplied by thermal conductivity = ", temp, "deg. C")
 
 ##  then multiply by Q, which is usually about 7 for residential
 ##  Q/k
+
+##  
 
 
 
