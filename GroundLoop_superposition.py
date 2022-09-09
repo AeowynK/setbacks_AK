@@ -308,62 +308,66 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
     x_row = []
     y_row = []
     delT_loc = []
-
-    for x, y in zip(x_locs, y_locs):
-        
-        Tmg_row = []
+    times = range[0, 1.578*(10**9)] #50 years span in seconds 
 
 
-        glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
-        z = glhe_gw.H/2
-        # Compute simulated values of ground loop temperature
+
+    for t in times:
+
+        delT = []  # create an empty array to store the delT values 
         theta = []
-
-        #tsparse = np.logspace(math.log10(times[0]), math.log10(times[-1]), num=num_g_calcs)
-
-        for t in times:
-            delT = glhe_gw.Tmfls(z, t)
-            theta.append(delT)
-        #g = np.asarray(theta)
-
+        Tmg_row = []
         
-#        delT = glhe_gw.Tmilss(z)
+    #g = np.asarray(theta)
 
-        delT_loc.append(theta) 
-        x_row.append(x)
-        y_row.append(y)
-        #g.append(detT)
+        for x, y in zip(x_locs, y_locs):
+
+            glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
+            z = glhe_gw.H/2
+            # Compute simulated values of ground loop temperature
+            
+
+            #tsparse = np.logspace(math.log10(times[0]), math.log10(times[-1]), num=num_g_calcs)
+
+            #delT = glhe_gw.Tmilss(z)
+
+            delT_loc.append(theta) 
+            x_row.append(x)
+            y_row.append(y)
+            #g.append(detT)            
+
+            params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
+
+            load = 7.0 # degree to which load is unbalanced
+    
+            B = 6.0   # in meters; CSA standard is 3m to property lines
+    
+            x_locs = [-3*B, -2*B, -1*B, -3*B, -2*B, -1*B, -3*B, -2*B, -1*B]
+            y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
+    
+            result = glhe_groundwater_model(params, x_locs, y_locs, delT)
+            #print(result)
+            
+            s = np.asarray(result[2]).sum()    # sum the delT values
+            temp = s*load    # multiply the sum by the load to get the change in temp
+            
+
+        delT = glhe_gw.Tmfls(z, t)  # calls the desired function 
+        theta.append(delT)    # appends delT values to theta array   
+        delT.append(delT)   # create array of summed delT values from each time
+        
+
 
     return (x_row, y_row, delT_loc)
 
 
-
 if __name__ == "__main__":
-
-
-    params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
-
-    load = 7.0 # degree to which load is unbalanced; would be 0 for perfectly balanced load
     
-    B = 6.0   # in meters; CSA standard is 3m to property lines
+
+
     
-    x_locs = [-4.5*B, -3.5*B, -2.5*B, -4.5*B, -3.5*B, -2.5*B, -4.5*B, -3.5*B, -2.5*B]
-    y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
-    times = [1.578*(10**9)] #50 years
-    
-    result = glhe_groundwater_model(params, x_locs, y_locs, times)
-   # print(result)
-    s = np.asarray(result[2]).sum()    # sum the delT values 
-    print("sum of delta Ts:", s)
-    
-    temp = s*load    # multiply the sum by the load 
-    print("Multiplied by thermal conductivity = ", temp, "deg. C")
+   
 
-##  then multiply by Q, which is usually about 7 for residential
-##  Q/k
-
-##  
-
-
+##  want to get Q/k
 
 
