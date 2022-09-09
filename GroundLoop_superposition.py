@@ -307,13 +307,16 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
 
     x_row = []
     y_row = []
+    g=[]
     delT_loc = []
     times = range[0, 1.578*(10**9)] #50 years span in seconds 
-
-    #Initialize models class and set value of z to the midpoint
+    load = 7.0 # degree to which load is unbalanced
+    B = 6.0   # in meters; CSA standard is 3m to property lines
     
-    glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
-    z = glhe_gw.H/2
+    x_locs = [-3*B, -2*B, -1*B, -3*B, -2*B, -1*B, -3*B, -2*B, -1*B]
+    y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
+
+
             
     for t in times:
 
@@ -321,46 +324,32 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
         theta = []
         Tmg_row = []
         
-    #g = np.asarray(theta)
-
         for x, y in zip(x_locs, y_locs):
-
-
-            # Compute simulated values of ground loop temperature
             
-
-            #tsparse = np.logspace(math.log10(times[0]), math.log10(times[-1]), num=num_g_calcs)
-
-            #delT = glhe_gw.Tmilss(z)
-
-            delT_loc.append(theta) 
-            x_row.append(x)
-            y_row.append(y)
-            #g.append(detT)            
-
-            load = 7.0 # degree to which load is unbalanced
-    
-            B = 6.0   # in meters; CSA standard is 3m to property lines
-    
-            x_locs = [-3*B, -2*B, -1*B, -3*B, -2*B, -1*B, -3*B, -2*B, -1*B]
-            y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
-    
-            s = np.asarray(result[2]).sum()    # sum the delT values
-            temp = s*load    # multiply the sum by the load to get the change in temp
+            #Initialize models class with new locaitons and set value of z to the midpoint
+            glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
+            z = glhe_gw.H/2
             
-
-        delT = glhe_gw.Tmfls(z, t)  # calls the desired function 
-        theta.append(delT)    # appends delT values to theta array   
-        delT.append(delT)   # create array of summed delT values from each time
+            # Compute simulated values of ground loop temperature for each location
+            delT = glhe_gw.Tmfls(z, t)  # calls the desired function 
+            # Append delT values to theta array for each of the borehole locations at time t   
+            theta.append(delT)    
+              
+        s = np.asarray(theta).sum()    # sum the delT values over locations
         
-    return (x_row, y_row, delT_loc)
+        #Calculate the total drawdown at the origin (x=0, y=0) 
+        temp = s*load    # multiply the sum by the load to get the change in temp
+        #store values at each location for times in loop.... call this g(t)
+        g = g.append(temp)       
+        
+    return (times, g)
 
 
 if __name__ == "__main__":
     
         params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
         
-        # Call funtion so that 'result' is what is 'returned'
+        # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
         result = glhe_groundwater_model(params, x_locs, y_locs, delT)
         
         #print(result)
