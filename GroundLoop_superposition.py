@@ -215,7 +215,7 @@ class gwModels:
             print ('warning: large Peclet number, not computing Tmfls ', self.pe)
             return
 
-    def Tmflss(self, z):  # noqa
+    def Tmflss(self, z):
         """
         Moving finite line source model steady state solution from Molina-
         Giraldo (2011), eqn 18
@@ -271,7 +271,7 @@ class gwModels:
         besselk = special.kn(0, arg)
         return 1.0/(4.0*math.pi*self.k)*2.0 * self.A * besselk
 
-    def Theis(self, t):  # noqa
+    def Theis(self, t):  
         u = (self.r * self.r) / (4.0 * self.a * t)
         w = scipy.special.expn(1, u)
         print(u,w)
