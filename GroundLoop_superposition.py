@@ -310,8 +310,11 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
     delT_loc = []
     times = range[0, 1.578*(10**9)] #50 years span in seconds 
 
-
-
+    #Initialize models class and set value of z to the midpoint
+    
+    glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
+    z = glhe_gw.H/2
+            
     for t in times:
 
         delT = []  # create an empty array to store the delT values 
@@ -322,8 +325,7 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
 
         for x, y in zip(x_locs, y_locs):
 
-            glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
-            z = glhe_gw.H/2
+
             # Compute simulated values of ground loop temperature
             
 
@@ -336,8 +338,6 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
             y_row.append(y)
             #g.append(detT)            
 
-            params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
-
             load = 7.0 # degree to which load is unbalanced
     
             B = 6.0   # in meters; CSA standard is 3m to property lines
@@ -345,9 +345,6 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
             x_locs = [-3*B, -2*B, -1*B, -3*B, -2*B, -1*B, -3*B, -2*B, -1*B]
             y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
     
-            result = glhe_groundwater_model(params, x_locs, y_locs, delT)
-            #print(result)
-            
             s = np.asarray(result[2]).sum()    # sum the delT values
             temp = s*load    # multiply the sum by the load to get the change in temp
             
@@ -356,15 +353,17 @@ def glhe_groundwater_model(params, x_locs, y_locs, times):
         theta.append(delT)    # appends delT values to theta array   
         delT.append(delT)   # create array of summed delT values from each time
         
-
-
     return (x_row, y_row, delT_loc)
 
 
 if __name__ == "__main__":
     
-
-
+        params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
+        
+        # Call funtion so that 'result' is what is 'returned'
+        result = glhe_groundwater_model(params, x_locs, y_locs, delT)
+        
+        #print(result)
     
    
 
