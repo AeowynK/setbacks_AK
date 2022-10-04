@@ -335,6 +335,8 @@ def glhe_groundwater_model(params):
         Y = []
         for x1, y1 in obs_grid:
             theta_loc = []
+            x_row = []
+            y_col = []
             for x2, y2 in bore_grid:
                 x = x2 - x1
                 y = y2 - y1
@@ -348,11 +350,11 @@ def glhe_groundwater_model(params):
                 delT = glhe_gw.Tmfls(z, t)  # calls the desired function
                 # Append delT values to theta array for each of the borehole locations at time t
                 theta_loc.append(delT)
-                print(x1, y1, x2, y2, x ,y, t, delT)
+
             X.append(x)
             Y.append(y)
             g.append(np.asarray(theta_loc).sum())   # sum the delT values over boreholes locations for time t and store in g
-            print(x1, y1, x2, y2, x, y, t, g)
+
         #before moving the next time, store time series for each observation s
         s.append(g)
         
@@ -360,18 +362,61 @@ def glhe_groundwater_model(params):
     return times, X, Y, s
 
 
+def plot_heatmap(nx, ny, x_values, y_values, z_values):
+    # contour RMSE with k and Rb_eff as axes
+    x = np.asarray(x_values)
+    y = np.asarray(y_values)
+    z = np.asarray(z_values[-1])
+    a = []
+    b = []
+    c = []
+    d = []
+    count = 0
+    for i in range(nx):
+        for j in range(ny):
+            a.append(x)
+            b.append(y)
+    count = 0
+    for i in range(nx):
+        c = []
+        for j in range(ny):
+            c.append(z[count])
+        count = count + 1
+        d.append(c)
+
+    X = np.asarray(a)
+    Y = np.asarray(b).T
+
+    #min_loc = np.unravel_index(np.argmin(z, axis=None), z.shape)
+    #x_opt = x_values[min_loc[0]][min_loc[1]]
+    #y_opt = y_values[min_loc[0]][min_loc[1]]
+    zmin, zmax = z.min(), z.max()
+    levels = np.logspace(math.log10(zmin) - 0.05, math.log10(zmax), num=20)
+    plt.contour(X, Y, d, levels, cmap='jet_r')
+    plt.colorbar()
+    plt.xlabel(r'$x [m]$')
+    plt.ylabel(r'$y [m]$')
+    plt.show()
+
+    # fig = plt.gcf()
+    # fig.set_size_inches(9, 5.5)
+        # imagefile = '../../ModelOutput.png'
+        # plt.savefig(imagefile, dpi=300)
+
 if __name__ == "__main__":
     
         params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
         
         # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
         times, X, Y, s = glhe_groundwater_model(params)
-        
-        plt.plot(np.asarray(times)/(86400*365),np.asarray(s))
-        plt.xlabel('time [years]')
-        plt.ylabel('thermal drawdown [C]')
-        plt.show()
-    
+        nx = ny = 6
+        #plt.plot(np.asarray(times)/(86400*365),np.asarray(s))
+        #plt.xlabel('time [years]')
+        #plt.ylabel('thermal drawdown [C]')
+        #plt.show()
+
+        plot_heatmap(nx, ny, X, Y, s)
+
    
 
 
