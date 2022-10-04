@@ -305,43 +305,59 @@ def glhe_groundwater_model(params):
     aquifer = Aquifer(params.gw, params.k, params.ps, params.cs,
                       params.pw, params.cw, params.n, params.To)
 
-    x_row = []
-    y_row = []
-    g = []
-    #create an array of times using logarithms
-    times = np.linspace(1, 10**9, num=50)
+
+    #create an array of times using linspace
+    times = np.linspace(1, 10**6, num=5)
     load = 7.0 # degree to which load is unbalanced
-    B = 6.0   # in meters; CSA standard is 3m to property lines
-    
-    x_locs = [-3*B, -2*B, -1*B, -3*B, -2*B, -1*B, -3*B, -2*B, -1*B]
-    y_locs = [-B, -B, -B, 0, 0, 0, B, B, B]
+    B = 3   # in meters; CSA standard is 3m to property lines
+    rb= 0.07
+    #x_locs and b_locs are locations of boreholes relative to origin
+    nx_b = 2
+    ny_b = 2
+
+    x_bore = np.arange(0, nx_b*B, B).tolist()
+    y_bore = np.arange(0, ny_b*B, B).tolist()
+
+    bore_grid = [[row, col] for row in x_bore for col in y_bore]
+
+    nx_obs = 2
+    ny_obs = 2
+    x_obs = np.arange(0, nx_obs*B, 1).tolist()
+    y_obs = np.arange(0, ny_obs*B, 1).tolist()
+
+    obs_grid = [[row, col] for row in x_obs for col in y_obs]
+
+    s = []
 
     for t in times:
+        g = []
+        X = []
+        Y = []
+        for x1, y1 in obs_grid:
+            theta_loc = []
+            for x2, y2 in bore_grid:
+                x = x2 - x1
+                y = y2 - y1
+                if abs(x) < rb: x = rb
+                if abs(y) < rb: y = rb
+                #Initialize models class with new locaitons and set value of z to the midpoint
+                glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
+                z = glhe_gw.H/2
 
-        delT = []  # create an empty array to store the delT values 
-        theta = []
-        Tmg_row = []
+                # Compute simulated values of ground loop temperature for each location
+                delT = glhe_gw.Tmfls(z, t)  # calls the desired function
+                # Append delT values to theta array for each of the borehole locations at time t
+                theta_loc.append(delT)
+                print(x1, y1, x2, y2, x ,y, t, delT)
+            X.append(x)
+            Y.append(y)
+            g.append(np.asarray(theta_loc).sum())   # sum the delT values over boreholes locations for time t and store in g
+            print(x1, y1, x2, y2, x, y, t, g)
+        #before moving the next time, store time series for each observation s
+        s.append(g)
         
-        for x, y in zip(x_locs, y_locs):
-            
-            #Initialize models class with new locaitons and set value of z to the midpoint
-            glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
-            z = glhe_gw.H/2
-            
-            # Compute simulated values of ground loop temperature for each location
-            delT = glhe_gw.Tmfls(z, t)  # calls the desired function 
-            # Append delT values to theta array for each of the borehole locations at time t   
-            theta.append(delT)    
-              
-        s = np.asarray(theta).sum()    # sum the delT values over locations
-        
-        #Calculate the total drawdown at the origin (x=0, y=0) 
-        temp = s*load    # multiply the sum by the load to get the change in temp
-        #store values at each location for times in loop.... call this g(t)
 
-        g.append(temp)
-        
-    return times, g
+    return times, X, Y, s
 
 
 if __name__ == "__main__":
@@ -349,9 +365,9 @@ if __name__ == "__main__":
         params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
         
         # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
-        times, g = glhe_groundwater_model(params)
+        times, X, Y, s = glhe_groundwater_model(params)
         
-        plt.plot(np.asarray(times)/(86400*365),np.asarray(g))
+        plt.plot(np.asarray(times)/(86400*365),np.asarray(s))
         plt.xlabel('time [years]')
         plt.ylabel('thermal drawdown [C]')
         plt.show()
