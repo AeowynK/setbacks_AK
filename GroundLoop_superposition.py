@@ -22,7 +22,7 @@ from scipy import integrate
 
 class Data:
 
-    def __init__(self, gw, k, ps, cs, pw, cw, n, to, H, phi):
+    def __init__(self, gw, k, ps, cs, pw, cw, n, to, H):
         """Aquifer attributes are assigned or calculated from the input
 
         In addition to the attributes that are passed directly as parameters
@@ -52,7 +52,6 @@ class Data:
         self.a = k / self.pc
         self.vt = (gw * pw * cw) / self.pc
         self.To = to
-        self.phi = phi
         self.H = H
 
 class Aquifer:
@@ -111,7 +110,7 @@ class gwModels:
     are passed to models.
     """
 
-    def __init__(self, x, y, h, vt, a, k, phi):
+    def __init__(self, x, y, h, vt, a, k):
         """ Assignment and calculation of attributes based on iput
 
         NOTE that DB has been added as an attribute so it can be determined
@@ -128,7 +127,19 @@ class gwModels:
         self.k = k
         self.vt = vt
         self.pe = (vt * h) / a
-        self.phi = phi
+        if (x >= 0) and (y > 0):
+            self.phi = math.atan(x/y)
+        elif (x >= 0) and (y < 0):
+            self.phi = 1/2*math.pi - math.atan(y/x)
+        elif x <= 0 and y < 0:
+            self.phi = math.pi - math.atan(x/y)
+        elif (x <= 0) and (y > 0):
+            self.phi = 3/2*math.pi - math.atan(y/x)
+        elif (x >= 0) and (y == 0):
+            self.phi = 0
+        elif (x <= 0) and (y == 0):
+            self.phi = math.pi
+
         self.A = math.exp((self.pe / 2.0) * self.Rprime * math.cos(self.phi))
 
     '''
@@ -338,12 +349,12 @@ def glhe_groundwater_model(params):
             x_row = []
             y_col = []
             for x2, y2 in bore_grid:
-                x = x2 - x1
-                y = y2 - y1
+                x = x1 - x2
+                y = y1 - y2
                 if abs(x) < rb: x = rb
                 if abs(y) < rb: y = rb
                 #Initialize models class with new locaitons and set value of z to the midpoint
-                glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k, params.phi)
+                glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k)
                 z = glhe_gw.H/2
 
                 # Compute simulated values of ground loop temperature for each location
@@ -404,7 +415,7 @@ def plot_heatmap(X, Y, s):
 
 if __name__ == "__main__":
     
-        params = Data(gw=5.e-16, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100, phi=0.)
+        params = Data(gw=5.e-7, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
         
         # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
         times, X, Y, s = glhe_groundwater_model(params)
