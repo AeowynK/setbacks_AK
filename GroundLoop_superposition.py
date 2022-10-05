@@ -307,24 +307,24 @@ def glhe_groundwater_model(params):
 
 
     #create an array of times using linspace
-    times = np.linspace(1, 10**6, num=5)
+    times = np.linspace(1, 10**8, num=5)
     load = 7.0 # degree to which load is unbalanced
     B = 3   # in meters; CSA standard is 3m to property lines
     rb= 0.07
     #x_locs and b_locs are locations of boreholes relative to origin
-    nx_b = 2
-    ny_b = 2
+    nx_b = 3
+    ny_b = 3
 
     x_bore = np.arange(0, nx_b*B, B).tolist()
     y_bore = np.arange(0, ny_b*B, B).tolist()
 
     bore_grid = [[row, col] for row in x_bore for col in y_bore]
 
-    nx_obs = 2
-    ny_obs = 2
-    x_obs = np.arange(0, nx_obs*B, 1).tolist()
-    y_obs = np.arange(0, ny_obs*B, 1).tolist()
-
+    nx_obs = 24
+    ny_obs = 24
+    x_obs = np.arange(-B, nx_b*B, nx_b*B/nx_obs).tolist()
+    y_obs = np.arange(-B, ny_b*B, ny_b*B/ny_obs).tolist()
+    obs_grid = []
     obs_grid = [[row, col] for row in x_obs for col in y_obs]
 
     s = []
@@ -351,8 +351,8 @@ def glhe_groundwater_model(params):
                 # Append delT values to theta array for each of the borehole locations at time t
                 theta_loc.append(delT)
 
-            X.append(x)
-            Y.append(y)
+            X.append(x1)
+            Y.append(y1)
             g.append(np.asarray(theta_loc).sum())   # sum the delT values over boreholes locations for time t and store in g
 
         #before moving the next time, store time series for each observation s
@@ -362,38 +362,37 @@ def glhe_groundwater_model(params):
     return times, X, Y, s
 
 
-def plot_heatmap(nx, ny, x_values, y_values, z_values):
-    # contour RMSE with k and Rb_eff as axes
-    x = np.asarray(x_values)
-    y = np.asarray(y_values)
-    z = np.asarray(z_values[-1])
-    a = []
-    b = []
-    c = []
+def plot_heatmap(X, Y, s):
+    x = np.asarray(X)
+    y = np.asarray(Y)
+    z = np.asarray(s[-1])
+
+    nx = int(math.sqrt(len(X)))
+    ny = int(math.sqrt(len(Y)))
+
     d = []
+    e = []
+    f = []
     count = 0
     for i in range(nx):
-        for j in range(ny):
-            a.append(x)
-            b.append(y)
-    count = 0
-    for i in range(nx):
+        a = []
+        b = []
         c = []
         for j in range(ny):
+            a.append(x[count])
+            b.append(y[count])
             c.append(z[count])
-        count = count + 1
-        d.append(c)
-
-    X = np.asarray(a)
-    Y = np.asarray(b).T
-
-    #min_loc = np.unravel_index(np.argmin(z, axis=None), z.shape)
-    #x_opt = x_values[min_loc[0]][min_loc[1]]
-    #y_opt = y_values[min_loc[0]][min_loc[1]]
+            count = count + 1
+        d.append(a)
+        e.append(b)
+        f.append(c)
     zmin, zmax = z.min(), z.max()
-    levels = np.logspace(math.log10(zmin) - 0.05, math.log10(zmax), num=20)
-    plt.contour(X, Y, d, levels, cmap='jet_r')
-    plt.colorbar()
+    levels = np.linspace(zmin - 0.1, zmax + 0.1, num=25)
+    fig, ax = plt.subplots()
+
+    contours = ax.contour(d, e, f, levels=np.asarray([1.0]))
+    cmesh = ax.pcolormesh(d, e, f, cmap='jet', shading='auto')
+    fig.colorbar(cmesh, ax=ax)
     plt.xlabel(r'$x [m]$')
     plt.ylabel(r'$y [m]$')
     plt.show()
@@ -409,13 +408,13 @@ if __name__ == "__main__":
         
         # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
         times, X, Y, s = glhe_groundwater_model(params)
-        nx = ny = 6
+
         #plt.plot(np.asarray(times)/(86400*365),np.asarray(s))
         #plt.xlabel('time [years]')
         #plt.ylabel('thermal drawdown [C]')
         #plt.show()
 
-        plot_heatmap(nx, ny, X, Y, s)
+        plot_heatmap(X, Y, s)
 
    
 
