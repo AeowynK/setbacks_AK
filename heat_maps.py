@@ -56,10 +56,11 @@ if __name__ == "__main__":
     script used for generating color contour plots 
     '''
     #times = np.linspace(1, 10**8, num=5)
-    times = [10**8]
+    times = [10**9]
     load = 7.0
     params = groundloop.Data(gw=5.e-7, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
-    config = groundloop.Configuration(nx_obs=24, ny_obs=24, B=3, nx_b=3, ny_b=3, rb=0.07)
+    #if nx_obs or ny_obs are greater than 1, then x_obs and y_obs are not used but need to be set.
+    config = groundloop.Configuration(nx_obs=24, ny_obs=24, B=3, nx_b=3, ny_b=3, rb=0.07, x_obs=0, y_obs=0)
     # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
     X, Y, s = groundloop.glhe_groundwater_model(times, params, config, load)
 
