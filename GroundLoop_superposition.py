@@ -54,6 +54,28 @@ class Data:
         self.To = to
         self.H = H
 
+class Configuration:
+    """configuraiton of borefield and observations
+    Attributes:
+        nx_obs = number of observation location in x direction
+        ny_obs = number of observations in y-direction
+        B = borehole spacing [m]
+        nx_b = number of boreholes in x-direction
+        ny_b = number of boreholes in y-direction
+        rb = radius of borehole [m]
+
+    """
+    def __init__(self, nx_obs, ny_obs, B, nx_b, ny_b, rb, x_obs, y_obs):
+        self.nx_obs = nx_obs
+        self.ny_obs = ny_obs
+        self.nx_b = nx_b
+        self.ny_b = ny_b
+        self.B = B
+        self.rb = rb
+        self.x_obs = x_obs
+        self.y_obs = y_obs
+
+
 class Aquifer:
     """Parameters assigned as static characteristics of the aquifer and GLHE
 
@@ -297,7 +319,7 @@ def log_interp(zz, xx, yy):
     return np.power(10.0, np.interp(logz, logx, logy))
 
 
-def glhe_groundwater_model(params):
+def glhe_groundwater_model(times, params, config, load):
 
     """
     Calculates thermal response at some specified location (usually borehole
@@ -316,27 +338,17 @@ def glhe_groundwater_model(params):
     aquifer = Aquifer(params.gw, params.k, params.ps, params.cs,
                       params.pw, params.cw, params.n, params.To)
 
-
-    #create an array of times using linspace
-    times = np.linspace(1, 10**8, num=5)
-    load = 7.0 # degree to which load is unbalanced
-    B = 3   # in meters; CSA standard is 3m to property lines
-    rb= 0.07
-    #x_locs and b_locs are locations of boreholes relative to origin
-    nx_b = 3
-    ny_b = 3
-
-    x_bore = np.arange(0, nx_b*B, B).tolist()
-    y_bore = np.arange(0, ny_b*B, B).tolist()
+    x_bore = np.arange(0, config.nx_b*config.B, config.B).tolist()
+    y_bore = np.arange(0, config.ny_b*config.B, config.B).tolist()
 
     bore_grid = [[row, col] for row in x_bore for col in y_bore]
 
-    nx_obs = 24
-    ny_obs = 24
-    x_obs = np.arange(-B, nx_b*B, nx_b*B/nx_obs).tolist()
-    y_obs = np.arange(-B, ny_b*B, ny_b*B/ny_obs).tolist()
-    obs_grid = []
-    obs_grid = [[row, col] for row in x_obs for col in y_obs]
+    if (config.nx_obs > 1) or (config.ny_obs > 1):
+        x_obs = np.arange(-config.B, config.nx_b*config.B, config.nx_b*config.B/config.nx_obs).tolist()
+        y_obs = np.arange(-config.B, config.ny_b*config.B, config.ny_b*config.B/config.ny_obs).tolist()
+        obs_grid = [[row, col] for row in x_obs for col in y_obs]
+    else:
+        obs_grid = [[config.x_obs, config.y_obs]]
 
     s = []
 
@@ -351,8 +363,10 @@ def glhe_groundwater_model(params):
             for x2, y2 in bore_grid:
                 x = x1 - x2
                 y = y1 - y2
-                if abs(x) < rb: x = rb
-                if abs(y) < rb: y = rb
+                if abs(x) < config.rb:
+                    x = config.rb
+                if abs(y) < config.rb:
+                    y = config.rb
                 #Initialize models class with new locaitons and set value of z to the midpoint
                 glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k)
                 z = glhe_gw.H/2
@@ -370,10 +384,11 @@ def glhe_groundwater_model(params):
         s.append(g)
         
 
-    return times, X, Y, s
+    return X, Y, s
 
 
 def plot_heatmap(X, Y, s):
+
     x = np.asarray(X)
     y = np.asarray(Y)
     z = np.asarray(s[-1])
@@ -403,7 +418,7 @@ def plot_heatmap(X, Y, s):
 
     contours = ax.contour(d, e, f, levels=np.asarray([1.0]))
     cmesh = ax.pcolormesh(d, e, f, cmap='jet', shading='auto')
-    fig.colorbar(cmesh, ax=ax)
+    fig.colorbar(cmesh, ax=ax) #, location='top')
     plt.xlabel(r'$x [m]$')
     plt.ylabel(r'$y [m]$')
     plt.show()
@@ -414,18 +429,16 @@ def plot_heatmap(X, Y, s):
         # plt.savefig(imagefile, dpi=300)
 
 if __name__ == "__main__":
-    
-        params = Data(gw=5.e-7, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
-        
-        # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
-        times, X, Y, s = glhe_groundwater_model(params)
+    '''
+    script used for testing and debugging of classes and functions
+    '''
+    # params = Data(gw=5.e-7, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
+    #config = Configuration(nx_obs=24, ny_obs=24, B=3, nx_b=3, ny_b=3, rb=0.07)
 
-        #plt.plot(np.asarray(times)/(86400*365),np.asarray(s))
-        #plt.xlabel('time [years]')
-        #plt.ylabel('thermal drawdown [C]')
-        #plt.show()
+    # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
+    # X, Y, s = glhe_groundwater_model(times, params, config, load)
 
-        plot_heatmap(X, Y, s)
+    # plot_heatmap(X, Y, s)
 
    
 
