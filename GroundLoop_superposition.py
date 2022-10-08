@@ -378,7 +378,7 @@ def glhe_groundwater_model(times, params, config, load):
 
             X.append(x1)
             Y.append(y1)
-            g.append(np.asarray(theta_loc).sum())   # sum the delT values over boreholes locations for time t and store in g
+            g.append(np.asarray(theta_loc).sum()*load)   # sum the delT values over boreholes locations for time t and store in g
 
         #before moving the next time, store time series for each observation s
         s.append(g)
