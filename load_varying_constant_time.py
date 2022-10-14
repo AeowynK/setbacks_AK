@@ -49,5 +49,6 @@ if __name__ == "__main__":
     # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
     X, Y, s = groundloop.glhe_groundwater_model(times, params, config, loads)
 
+    print(s)
 
     plot_load_series(loads, X, Y, s)
