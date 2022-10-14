@@ -10,21 +10,11 @@ import numpy as np
 import math
 import GroundLoop_superposition as groundloop
 
-def plot_load_series(times, X, Y, s):
-
-    x = X[0]
-    y = Y[0]
-
-    delT = []
-    for i in range(len(s)):
-        delT.append(s[i][0])
-    z = np.asarray(delT)
-    print(x, y, z)
-
+def plot_load_series(loads, delT):
 
     fig, ax = plt.subplots()
 
-    ax.plot(loads, z)
+    ax.plot(loads, delT)
     #fig.colorbar(cmesh, ax=ax)  # , location='top')
     plt.xlabel('load, 0 - 7')
     plt.ylabel('Thermal drawdown [$^\circ C$]')
@@ -41,14 +31,16 @@ if __name__ == "__main__":
     script used for generating time series at a single location 
     '''
     times = [10**9] 
-
+    delT = []
     loads = np.linspace(0, 7, num=8) 
-    
-    params = groundloop.Data(gw=5.e-17, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
-    config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=3, nx_b=1, ny_b=2, rb=0.07, x_obs=-3, y_obs=0)
-    # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
-    X, Y, s = groundloop.glhe_groundwater_model(times, params, config, loads)
+    for load in loads:
+        params = groundloop.Data(gw=5.e-17, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
+        # If nx_obs or ny_obs are not equal to 1, then grid is constructed.  Otherwise, a single location
+        config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=3, nx_b=1, ny_b=2, rb=0.07, x_obs=-3, y_obs=0)
+        # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
+        X, Y, s = groundloop.glhe_groundwater_model(times, params, config, load)
 
-    print(s)
+        delT.append(s[0][0])
 
-    plot_load_series(loads, X, Y, s)
+
+    plot_load_series(loads, delT)
