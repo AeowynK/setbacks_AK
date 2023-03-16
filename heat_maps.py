@@ -40,7 +40,9 @@ def plot_heatmap(X, Y, s):
 
     contours = ax.contour(d, e, f, levels=np.asarray([1.0]))
     cmesh = ax.pcolormesh(d, e, f, cmap='jet', shading='auto')
-    fig.colorbar(cmesh, ax=ax)  # , location='top')
+    cbar = fig.colorbar(cmesh, ax=ax)  # , location='top')
+    cbar.set_label("temperature change,°C", fontsize = 15)
+    plt.title('Heat map of subsurface temperature change [°C] over \n50 years in a 3 x 3 borehole field with groundwater flow', fontsize = 15)
     plt.xlabel(r'$x [m]$')
     plt.ylabel(r'$y [m]$')
     plt.show()
@@ -56,7 +58,8 @@ if __name__ == "__main__":
     script used for generating color contour plots 
     '''
     #times = np.linspace(1, 10**8, num=5)
-    times = [10**9]
+    times = [1.578*(10**9)]
+    # 50 years in seconds 
     load = 7.0
     params = groundloop.Data(gw=5.e-7, k=1.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
     #if nx_obs or ny_obs are greater than 1, then x_obs and y_obs are not used but need to be set.
