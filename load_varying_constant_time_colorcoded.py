@@ -39,7 +39,7 @@ def plot_loadcondmap(x, y, delT):
 
     # create the pcolormesh plot
     fig, ax = plt.subplots()
-    c = ax.pcolormesh(x, y, delT, cmap= 'BuPu', vmin=min(thresholds), vmax=max(thresholds))
+    c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
     # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html 
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
     ax.clabel(l, levels = levels)
