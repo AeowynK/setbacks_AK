@@ -31,7 +31,7 @@ def plot_loadcondmap(x, y, delT):
     levels = np.linspace(0, 9, 19)
 
     # impact thresholds
-    thresholds = [0, 1.5, 3]
+    thresholds = [0, 2, 4]
 
     # define the colormap object
     cmap = plt.cm.get_cmap('BuPu', len(thresholds)-1)
