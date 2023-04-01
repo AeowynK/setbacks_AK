@@ -54,10 +54,9 @@ def calculate_time_series(times, q, glhe_gw):
 
     for t in times:
         delT = glhe_gw.Tmfls(glhe_gw.H/2, t)
-        T = 1.0 / (4.0 * math.pi * glhe_gw.k) * delT
         # integral.append(delT[0])
         # quad_error.append(delT[1])
-        theta.append(T)
+        theta.append(delT)
     W = np.asarray(theta)
     Br = np.diff(W, n=1)  # Block Response is first difference of well function
     Br = np.insert(Br, 0, W[0])  # insert first element of W into Block Response
@@ -69,16 +68,20 @@ if __name__ == "__main__":
     '''
     Establish aquifer parameters, dimensionless parameters, and initialize models
     '''
-    times = np.arange(1, 50*365*86400, 86400)
-    q = 10 + 0*np.sin(np.pi*times/(180*86400))
-
+    times = np.arange(1, 50*365*86400, 30*86400)
+    q = 5 + 10*np.sin(np.pi*times/(180*86400))
 
     params = Data(gw=5.e-17, k=2.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
 
-    glhe_gw = gwModels(x=.07, y=0, h=params.H, vt=params.vt, a=params.a, k=params.k)
+    for r in [0.07, 1, 2, 3]:
 
+        glhe_gw = gwModels(x=r, y=0, h=params.H, vt=params.vt, a=params.a, k=params.k)
+        s = calculate_time_series(times,q, glhe_gw)
+        years = times/(365*86400)
+        plt.plot(years, s, label= 'r='+str(r)+'m')
 
-    s = calculate_time_series(times,q, glhe_gw)
-
-    plt.plot(times, s)
+    plt.legend()
+    plt.title('Thermal drawdown at different distances for 5 W/m unbalanced load \n with +/- 10 W/m operational range')
+    plt.ylabel("temperature change,°C")
+    plt.xlabel("time [years]")
     plt.show()
