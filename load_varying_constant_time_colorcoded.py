@@ -39,8 +39,18 @@ def plot_loadcondmap(x, y, delT):
 
     # create the pcolormesh plot
     fig, ax = plt.subplots()
-    c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
-    # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html 
+    #c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
+    # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html
+
+    # an alternative method for coloring in plot, using discrete colors for intervals
+    levels = [0, 1, 2, 3, 4]
+    origin = 'lower'
+    c = ax.contourf(x, y, delT, levels,
+                       colors=('g', 'y', 'y', 'r', 'r'),
+                       origin=origin,
+                       extend='both',
+                       alpha=0.5)
+
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
     ax.clabel(l, levels = levels)
     ax.set_title('2 boreholes Temp. change in deg. C\nat property line (no setback) over 50 years\n& inter-borehole spacing of 6 m', fontsize = 17)
