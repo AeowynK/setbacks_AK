@@ -362,7 +362,12 @@ def glhe_groundwater_model(times, params, config, load):
     It will denote these radii as being at (3, 1.5) and (3, -1.5). It creates a 'origin' where it is placed
     and uses that to reference its calculations. The (3,1.5) signifies the distance to the upper borehole
     which is 1.5 meters up on the y axis while the (3, -1.5) signifies the distance to the lower borehole
-    which is 1.5 meters down on the y-axis. 
+    which is 1.5 meters down on the y-axis.
+    The number of obseervation location calculations is the same as the number of boreholes, since the script
+    is performing a superposition.
+    In cases where the observation location is in line horizontally (along the x axis) with all boreholes
+    (so, if one borehole at (0,0) and obs location at (0, 3), or any additional boreholes along the x axis,
+    the script uses the borehoe radius (0.07m) to calculate its superposition distances. 
     """
     print(' ------ \n')
 
