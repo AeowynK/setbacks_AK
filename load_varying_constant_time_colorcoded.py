@@ -31,7 +31,7 @@ def plot_loadcondmap(x, y, delT):
     levels = np.linspace(0, 9, 19)
 
     # impact thresholds
-    thresholds = [0, 2, 4]
+    thresholds = [0, 1, 3]
 
     # define the colormap object
     cmap = plt.cm.get_cmap('BuPu', len(thresholds)-1)
@@ -39,17 +39,17 @@ def plot_loadcondmap(x, y, delT):
 
     # create the pcolormesh plot
     fig, ax = plt.subplots()
-    #c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
+    c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
     # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html
 
     # an alternative method for coloring in plot, using discrete colors for intervals
-    levels = [0, 1, 2, 3, 4]
-    origin = 'lower'
-    c = ax.contourf(x, y, delT, levels,
-                       colors=('g', 'y', 'y', 'r', 'r'),
-                       origin=origin,
-                       extend='both',
-                       alpha=0.5)
+##    levels = [0, 1, 2, 3, 4]
+##    origin = 'lower'
+##    c = ax.contourf(x, y, delT, levels,
+##                       colors=('g', 'y', 'y', 'r', 'r'),
+##                       origin=origin,
+##                       extend='both',
+##                       alpha=0.5)
 
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
     ax.clabel(l, levels = levels)
