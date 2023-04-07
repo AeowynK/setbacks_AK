@@ -26,20 +26,20 @@ def plot_loadcondmap(x, y, delT):
 
     # generate 2 2d grids for the load & k (thermal conductivity) bounds
     loads, ks = np.meshgrid(np.linspace(0, 10, 25), np.linspace(1.5, 5, 25))
- 
-    # define the color levels
-    levels = np.linspace(0, 9, 19)
 
-    # impact thresholds
-    thresholds = [0, 1, 3]
 
-    # define the colormap object
-    cmap = plt.cm.get_cmap('BuPu', len(thresholds)-1)
+##    # impact thresholds
+##    thresholds = [0, 2, 4]
+##
+##    # define the colormap object
+##    cmap = plt.cm.get_cmap('BuPu', len(thresholds)-1)
 
 
     # create the pcolormesh plot
     fig, ax = plt.subplots()
-    c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r', vmin=min(thresholds), vmax=max(thresholds))
+    # define the temp levels 
+    levels = np.linspace(0, 9, 19)
+    c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r') # vmin=min(thresholds), vmax=max(thresholds))
     # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html
 
     # an alternative method for coloring in plot, using discrete colors for intervals
