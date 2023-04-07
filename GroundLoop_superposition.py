@@ -351,6 +351,19 @@ def glhe_groundwater_model(times, params, config, load):
         obs_grid = [[config.x_obs, config.y_obs]]
 
     s = []
+    """
+    This scrip builds a grid of borehole locations that begins at the origin and expands into the first quadrant.
+    The borehole grid is built by defining the number of boreholes in each direction as is based on the embedded
+    cartesian coordinates.
+    The observation grid/location is placed at a desired specific location(s).
+    This grid has its own coordinate system; for example:
+    If I have two boreholes, one at (0,0 and one at (0,3) and I want my obs location at (3, 1.5) to signifiy a
+    property line setback of 3m, the obsersation domain will calculate the radii for each borehole.
+    It will denote these radii as being at (3, 1.5) and (3, -1.5). It creates a 'origin' where it is placed
+    and uses that to reference its calculations. The (3,1.5) signifies the distance to the upper borehole
+    which is 1.5 meters up on the y axis while the (3, -1.5) signifies the distance to the lower borehole
+    which is 1.5 meters down on the y-axis. 
+    """
     print(' ------ \n')
 
     print('x_bore \n', x_bore)
