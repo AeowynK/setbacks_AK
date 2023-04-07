@@ -57,7 +57,7 @@ class Data:
 class Configuration:
     """configuraiton of borefield and observations
     Attributes:
-        nx_obs = number of observation location in x direction
+        nx_obs = number of observation locations in x direction
         ny_obs = number of observations in y-direction
         B = borehole spacing [m]
         nx_b = number of boreholes in x-direction
@@ -351,7 +351,15 @@ def glhe_groundwater_model(times, params, config, load):
         obs_grid = [[config.x_obs, config.y_obs]]
 
     s = []
+    print(' ------ \n')
 
+    print('x_bore \n', x_bore)
+
+    print('y_bore \n', y_bore)
+
+    print('bore_grid \n', bore_grid)
+
+    print('obs_grid \n', obs_grid)
     for t in times:
         g = []
         X = []
@@ -367,6 +375,8 @@ def glhe_groundwater_model(times, params, config, load):
                     x = config.rb
                 if abs(y) < config.rb:
                     y = config.rb
+                print('x and y locations of observation location')
+                print(x, y)
                 #Initialize models class with new locaitons and set value of z to the midpoint
                 glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k)
                 z = glhe_gw.H/2

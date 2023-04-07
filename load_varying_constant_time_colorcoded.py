@@ -75,8 +75,8 @@ if __name__ == "__main__":
     '''
     script used for generating time series at a single location 
     '''
-    loads = np.linspace(0, 10, 25)
-    ks = np.linspace(1.5, 6, 25)
+    loads = np.linspace(0, 10, 2)
+    ks = np.linspace(1.5, 6, 2)
     times = [1.577*(10**9)]
     # 50 years in seconds 
     delT = []
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             
             params = groundloop.Data(gw=5.e-17, k=k, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
             # If nx_obs or ny_obs are not equal to 1, then grid is constructed.  Otherwise, a single location
-            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=3, nx_b=1, ny_b=2, rb=0.07, x_obs=0, y_obs=0)
+            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=3, nx_b=1, ny_b=2, rb=0.07, x_obs=1, y_obs=0)
             # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
             X, Y, s = groundloop.glhe_groundwater_model(times, params, config, load)
             
