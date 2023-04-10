@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 import flopy.utils.binaryfile as bf
 import pandas as pd
 
-# assigning model info:
+# assigning model info: [metric]
 
 Lx = 50.
 Ly = 50.
 # size of model, in meters
 ztop = 0.0
 zbot = -1.0
-# thickness, b
+# thickness, b, meters
 nlay = 1
 nrow = 200
 ncol = 200
@@ -187,7 +187,7 @@ head = hds.get_data(totim=times[-1])
 
 # contouring the heads
 extent = (delr / 2.0, Lx - delr / 2.0, Ly - delc / 2.0, delc / 2.0)
-fig = plt.figure(figsize=(6, 6))
+fig = plt.figure(figsize=(7, 7))
 ax = fig.add_subplot(1, 1, 1, aspect="equal")
 CS = ax.contour(head[0, :, :], levels=np.arange(0, 1, .01), extent=extent)
 ax.clabel(CS, CS.levels, inline=True, fontsize=8)
