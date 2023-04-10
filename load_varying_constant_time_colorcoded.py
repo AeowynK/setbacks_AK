@@ -75,8 +75,8 @@ if __name__ == "__main__":
     '''
     script used for generating time series at a single location 
     '''
-    loads = np.linspace(0, 10, 2)
-    ks = np.linspace(1.5, 6, 2)
+    loads = np.linspace(0, 10, 25)
+    ks = np.linspace(1.5, 6, 25)
     times = [4.734*(10**8)]
     # 15 years in seconds 
     delT = []

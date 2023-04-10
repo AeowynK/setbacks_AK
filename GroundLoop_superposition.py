@@ -369,15 +369,15 @@ def glhe_groundwater_model(times, params, config, load):
     (so, if one borehole at (0,0) and obs location at (0, 3), or any additional boreholes along the x axis,
     the script uses the borehoe radius (0.07m) to calculate its superposition distances. 
     """
-    print(' ------ \n')
+    #print(' ------ \n')
 
-    print('x_bore \n', x_bore)
+    #print('x_bore \n', x_bore)
 
-    print('y_bore \n', y_bore)
+    #print('y_bore \n', y_bore)
 
-    print('bore_grid \n', bore_grid)
+    #print('bore_grid \n', bore_grid)
 
-    print('obs_grid \n', obs_grid)
+    #print('obs_grid \n', obs_grid)
     for t in times:
         g = []
         X = []
@@ -393,8 +393,8 @@ def glhe_groundwater_model(times, params, config, load):
                     x = config.rb
                 if abs(y) < config.rb:
                     y = config.rb
-                print('x and y locations of observation location')
-                print(x, y)
+                #print('x and y locations of observation location')
+                #print(x, y)
                 #Initialize models class with new locaitons and set value of z to the midpoint
                 glhe_gw = gwModels(x, y, params.H, aquifer.vt, aquifer.a, aquifer.k)
                 z = glhe_gw.H/2
