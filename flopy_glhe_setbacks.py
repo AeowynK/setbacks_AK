@@ -52,6 +52,8 @@ set up stress period times
 nper = len(data)
 nstp = np.ones(nper, dtype=int)*5
 perlen = np.ones(nper)*3600
+
+# multiplier on ts
 tsmult = 1.2
 
 # steady state condition - False for transient
@@ -167,12 +169,12 @@ cbb = bf.CellBudgetFile(modelname + ".cbc")
 # Plot the temperature change versus time
 idx = (0, int(nrow / 4) - 1, int(ncol / 4) - 1)
 ts = headobj.get_ts(idx)
-fig = plt.figure(figsize=(6, 6))
+fig = plt.figure(figsize=(7, 7))
 ax = fig.add_subplot(1, 1, 1)
-ttl = "Temperature ({0},{1},{2})".format(idx[0] + 1, idx[1] + 1, idx[2] + 1)
+ttl = "Temperature change in °C at ({0},{1},{2}) for a thermal conductitivity of \n2.5 [W/m*K] and varying load [W/m]".format(idx[0] + 1, idx[1] + 1, idx[2] + 1)
 ax.set_title(ttl)
 ax.set_xlabel("time [s]")
-ax.set_ylabel("Temp Change[C]")
+ax.set_ylabel("Temperature Change[°C]")
 ax.plot(ts[:, 0], ts[:, 1], "bo-")
 plt.show()
 
