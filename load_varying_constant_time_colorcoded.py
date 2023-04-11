@@ -38,7 +38,7 @@ def plot_loadcondmap(x, y, delT):
     # create the pcolormesh plot
     fig, ax = plt.subplots()
     # define the temp levels 
-    levels = np.linspace(0, 9, 19)
+    levels = np.linspace(0, 10, 11)
     c = ax.pcolormesh(x, y, delT, cmap= 'RdYlGn_r') # vmin=min(thresholds), vmax=max(thresholds))
     # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html
 
@@ -53,7 +53,7 @@ def plot_loadcondmap(x, y, delT):
 
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
     ax.clabel(l, levels = levels)
-    ax.set_title('2 boreholes: Temp. change in °C at \n3m setback over 15 years & \ninter-borehole spacing of 3 m', fontsize = 17)
+    ax.set_title('9 boreholes: Temp. change in °C at \n6m setback over 15 years & \ninter-borehole spacing of 6m', fontsize = 17)
 
     # set the limits of the plot to the limits of the data
     ax.axis([x.min(), x.max(), y.min(), y.max()])
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             
             params = groundloop.Data(gw=5.e-17, k=k, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
             # If nx_obs or ny_obs are not equal to 1, then grid is constructed.  Otherwise, a single location
-            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=3, nx_b=1, ny_b=2, rb=0.07, x_obs=3, y_obs=1.5)
+            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=6, nx_b=3, ny_b=3, rb=0.07, x_obs=18, y_obs=6)
             # borehole brid starts at the origin and proceeds into first quadrant
             # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
             X, Y, s = groundloop.glhe_groundwater_model(times, params, config, load)
