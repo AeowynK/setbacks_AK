@@ -68,12 +68,14 @@ if __name__ == "__main__":
     '''
     Establish aquifer parameters, dimensionless parameters, and initialize models
     '''
-    times = np.arange(1, 50*365*86400, 30*86400)
+    times = np.arange(1, 15*365*86400, 30*86400)
+    # input years desired here as multiplier
     q = 5 + 10*np.sin(np.pi*times/(180*86400))
+    # specifies unbalanced base load and range
 
     params = Data(gw=5.e-17, k=2.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
 
-    for r in [0.07, 1, 2, 3]:
+    for r in [1.5, 6, 9]:
 
         glhe_gw = gwModels(x=r, y=0, h=params.H, vt=params.vt, a=params.a, k=params.k)
         s = calculate_time_series(times,q, glhe_gw)
@@ -81,7 +83,7 @@ if __name__ == "__main__":
         plt.plot(years, s, label= 'r='+str(r)+'m')
 
     plt.legend()
-    plt.title('Thermal drawdown at different distances for 5 W/m unbalanced load \n with +/- 10 W/m operational range')
-    plt.ylabel("temperature change,°C")
-    plt.xlabel("time [years]")
+    plt.title('Thermal drawdown at different distances for \n5 W/m unbalanced load with +/- 10 W/m operational range', fontsize = 14)
+    plt.ylabel("temperature change,°C", fontsize = 14)
+    plt.xlabel("time [years]", fontsize = 14)
     plt.show()
