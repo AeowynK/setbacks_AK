@@ -133,7 +133,7 @@ class gwModels:
     """
 
     def __init__(self, x, y, h, vt, a, k):
-        """ Assignment and calculation of attributes based on iput
+        """ Assignment and calculation of attributes based on input
 
         NOTE that DB has been added as an attribute so it can be determined
         if integration on theta is necessary.  Result will be integrated on

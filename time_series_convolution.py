@@ -73,9 +73,9 @@ if __name__ == "__main__":
     q = 5 + 10*np.sin(np.pi*times/(180*86400))
     # specifies unbalanced base load and range
 
-    params = Data(gw=5.e-17, k=2.5, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
+    params = Data(gw=5.e-17, k=1, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
 
-    for r in [1.5, 6, 9]:
+    for r in [0.07, 1.5, 3, 6]:
 
         glhe_gw = gwModels(x=r, y=0, h=params.H, vt=params.vt, a=params.a, k=params.k)
         s = calculate_time_series(times,q, glhe_gw)
