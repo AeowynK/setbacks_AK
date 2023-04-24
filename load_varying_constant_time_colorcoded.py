@@ -62,7 +62,7 @@ def plot_loadcondmap(x, y, delT):
 
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
     ax.clabel(l, levels = levels)
-    ax.set_title('9 boreholes: Temp. change in °C at \n18m distance over 15 years & \ninter-borehole spacing of 7.6m', fontsize = 17)
+    ax.set_title('9 boreholes: Temp. change in °C at \n12m distance over 15 years & \ninter-borehole spacing of 6m', fontsize = 17)
 
     # set the limits of the plot to the limits of the data
     ax.axis([x.min(), x.max(), y.min(), y.max()])
