@@ -34,6 +34,7 @@ def plot_loadcondmap(x, y, delT):
     # Define the fixed color range for the plot
     cmap = plt.cm.RdYlGn_r
     norm = plt.Normalize(temp_min, temp_max)
+    cmap.set_over('lightgrey')
 
 
 ##    # impact thresholds
@@ -46,7 +47,7 @@ def plot_loadcondmap(x, y, delT):
     # create the pcolormesh plot
     fig, ax = plt.subplots()
     # define the temp levels 
-    levels = np.linspace(0, 10, 11)
+    levels = np.linspace(1, 2, 3)
     c = ax.pcolormesh(x, y, delT, cmap=cmap, norm=norm)
     # vmin=min(thresholds), vmax=max(thresholds))
     # colors from: https://matplotlib.org/stable/tutorials/colors/colormaps.html
@@ -61,7 +62,13 @@ def plot_loadcondmap(x, y, delT):
 ##                       alpha=0.5)
 
     l = ax.contour(x, y, delT, colors = 'Black', linewidths=1, levels = levels)
-    ax.clabel(l, levels = levels)
+
+    fmt = {}
+    strs = ['negligible impact', 'possible impact', 'request technical review']
+    for label, s in zip(l.levels, strs):
+        fmt[label] = s
+
+    ax.clabel(l, l.levels, inline=True, fmt=fmt, fontsize = 10) #levels = levels)
     ax.set_title('9 boreholes: Temp. change in °C at \n12m distance over 15 years & \ninter-borehole spacing of 6m', fontsize = 17)
 
     # set the limits of the plot to the limits of the data
@@ -74,7 +81,11 @@ def plot_loadcondmap(x, y, delT):
     # Create axis labels
     plt.ylabel("net annual ground load, W/m", fontsize = 15)
     plt.xlabel("thermal conductivity, W/(m⋅K)", fontsize = 15)
-    
+
+    ax.annotate('neighboring system experiences \n'
+                'excessive thermal drawdown \n'
+                'sustained operation unlikely',
+                xy=(2, 8), xytext=(2, 8))
     #show plot
     plt.show()
 
@@ -101,7 +112,7 @@ if __name__ == "__main__":
             
             params = groundloop.Data(gw=5.e-17, k=k, ps=2650, cs=880, pw=1016, cw=3850, n=.1, to=0, H=100)
             # If nx_obs or ny_obs are not equal to 1, then grid is constructed.  Otherwise, a single location
-            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=6, nx_b=3, ny_b=3, rb=0.07, x_obs=24, y_obs=6)
+            config = groundloop.Configuration(nx_obs=1, ny_obs=1, B=6, nx_b=3, ny_b=3, rb=0.07, x_obs=24, y_obs=3)
             # borehole brid starts at the origin and proceeds into first quadrant
             # Call funtion so that 'result' is what is 'returned'.  In this case, two arrays, one with times the other with drawdowns
             X, Y, s = groundloop.glhe_groundwater_model(times, params, config, load)
